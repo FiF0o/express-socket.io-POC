@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+  </head>
+  <body>
+    <header>
+      <h1>Hello from Chattr</h1>
+    </header>
+    <main>
+      <h2>Users</h2>
+      <section>
+        <ul id="user-list">
+          <li>
+            user 1
+          </li>
+        </ul>
+      </section>
+      <h2>Chattr</h2>
+      <section>
+        <h3 id="status">You are offline</h3>
+        <p>joined the room</p>
+        <div>
+          <ul id="message-list">
+            <li>Hi to all the Chattr users</li>
+          </ul>
+        </div>
+      </section>
+      <section>
+        <form action="" id="chat_form">
+          <label for="chat_input">chat</label>
+          <input type="text" name="" value="" id="chat_input">
+          <input type="submit" value="Submit">
+        </form>
+        <!-- <button>Send</button> -->
+      </section>
+    </main>
+    <footer>
+
+    </footer>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <!-- <script src="./node_modules/socket.io/lib/index.js"></script> -->
+     <script src="./dist/bundle.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    var socket = io.connect('http://localhost:3004');
+    var insertMessage = function() {
+        $('#chat_form').submit(function(e){
+          e.preventDefault();
+            var newMessage = $('#chat_input').val();
+            $("#message-list").append("<li>"+newMessage+"</li>"))
+        })
+    }
+
+    $('#chat_form').submit(function(e){
+      e.preventDefault()
+        var message = $('#chat_input').val();
+        socket.emit("messages", message)
+    })
+
+    socket.on("messages", function(data) {
+        insertMessage(data)
+    });
+
+    socket.on('connect', function(data) {
+      $('#status').html('Connected to Chattr')
+      nickname = prompt("What is your nickname?")
+      socket.emit('join', nickname)
+      console.log(nickname, ' joined the channel')
+      $("#user-list").append("<li>"+nickname+"</li>")
+    })
+    </script>
+  </body>
+</html>

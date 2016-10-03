@@ -1,0 +1,35 @@
+{
+  "name": "question",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf dist/*",
+    "dist": "mkdir dist",
+    "cp": "cp -r src/** dist",
+    "js": "browserify src/main.js -o ./dist/bundle.js -d",
+    "js:watch": "watchify src/main.js -o dist/bundle.js -v",
+    "js:uglify": "uglifyjs dist\bundle.js  > dist\bundle.min.js",
+    "build": "npm run clean dist cp js js:watch",
+    "cp:index": "cp src/index.html dist/index.html",
+    "js:lint": "jslint src/*.js --exclude node_modules/ --verbose",
+    "js:dev": "browserify src/main.js | uglifyjs -mc > dist/bundle.js",
+    "dev": "npm run cp:index js:dev",
+    "prod": "browserify src/main.js  | uglifyjs -mc warnings=false > dist/bundle.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.0",
+    "http": "0.0.0",
+    "jshint": "^2.9.3",
+    "jslint": "^0.10.3",
+    "redis": "^2.6.2",
+    "redis-server": "0.0.3",
+    "socket.io": "^1.4.8",
+    "socket.io-browserify": "^0.9.6",
+    "uglifyjs": "^2.4.10",
+    "watchify": "^3.7.0"
+  }
+}
