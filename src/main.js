@@ -2,6 +2,11 @@ var socket = io.connect('http://localhost:3004');
 
 (function() {
   console.log('Socket is opened...')
+  console.log(socket)
+
+  var insertUser = function(newUser) {
+    $("#").append("<li>" + newUser + "</li>")
+  }
 
   var insertMessage = function(newMessage) {
     $("#message-list").append("<li>"+newMessage+"</li>")
@@ -10,8 +15,8 @@ var socket = io.connect('http://localhost:3004');
   $('#chat_form').submit(function(e){
     e.preventDefault()
     var message = $('#chat_input').val();
+    // messages init here
     socket.emit("messages", message)
-    //insertMessage(message)
     $('#chat_input').val("");
   })
 
@@ -21,12 +26,12 @@ var socket = io.connect('http://localhost:3004');
 
   socket.on('connect', function(nickname) {
     $('#status').html('Connected to Chattr')
-    nickname = prompt("What is your nickname?")
+    var nickname = window.nickname = prompt("What is your nickname?")
     socket.emit('join', nickname)
-    $("#user-list").append("<li>"+nickname+"</li>")
+    insertUser(nickname)
   })
-  socket.on('disconnect', function (socket) {
-    var m = "user"
-    socket.emit("leave_channel", m )
+  socket.on('disconnect', function (window) {
+    var leaver = window.nickname
+    socket.emit("leave_channel", leaver)
   });
 })()

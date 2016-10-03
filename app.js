@@ -20,31 +20,32 @@ var storeMessage = function(name, message) {
 io.on('connection', function(client) {
   console.log('Client connected...')
 
+  // creates a pseudo accessible in closures below
+  var pseudo = 'Unknown'
+
   // shows usernames when people joins the chat
   client.on('join', function(nickname) {
     // sets a value for the nickname on the client side - available on client and server
-    client.nickname = nickname
-    console.log(nickname, 'has joined the channel!')
+    // reassigns nickname to pseudo var
+    pseudo = nickname
+    client.broadcast.emit("connect", pseudo)
+
   })
 
   // emits messages event on the client/browser sending the object
-  client.on('messages', function(data) {
-    // gets client nickname befire broadcasting a message
-    var message = data
-    console.log('server - message:', message)
-    var nickname = client.nickname
-    console.log('server - nickname :', nickname)
+  client.on('messages', function(message) {
+    // pseudo available in the closure above
+    console.log(pseudo + ' says: ' + message)
       // server broadcast the messages to other clients connected when a message is received from a client
-    client.broadcast.emit("messages", nickname + ": " + message)
+    client.broadcast.emit("messages", pseudo + ": " + message)
     //emits messages on the current message to render what we type - message back to our client
-    client.emit("messages", nickname + ": " + message)
+    client.emit("messages", pseudo + ": " + message)
     // message is stored in the message store
-    storeMessage(nickname, message);
-    console.log(storeMessage)
+    storeMessage(pseudo, message);
   })
 
-  client.on('leave_channel', function(data, socket) {
-    console.log(data,'has disconnected!')
+  client.on('leave_channel', function(leaver) {
+    console.log(leaver +' user has disconnected!')
   })
 });
 
