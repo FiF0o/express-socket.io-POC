@@ -2,14 +2,21 @@ var socket = io.connect('http://localhost:3004');
 
 (function() {
   console.log('Socket is opened...')
-  console.log(socket)
 
   var insertUser = function(newUser) {
-    $("#").append("<li>" + newUser + "</li>")
+    $("#user-list").append("<li>" + newUser + "</li>")
   }
 
   var insertMessage = function(newMessage) {
     $("#message-list").append("<li>"+newMessage+"</li>")
+  }
+
+  var userJoined = function(newUser) {
+    if(newUser) {
+      $('#new_user').text(newUser + ' has joined the chat!')
+    } else {
+      console.log('User has joined the chat!')
+    }
   }
 
   $('#chat_form').submit(function(e){
@@ -26,12 +33,18 @@ var socket = io.connect('http://localhost:3004');
 
   socket.on('connect', function(nickname) {
     $('#status').html('Connected to Chattr')
+    // init here
     var nickname = window.nickname = prompt("What is your nickname?")
     socket.emit('join', nickname)
-    insertUser(nickname)
   })
+
+  socket.on('user_connected', function(data) {
+    console.log('user_connected data:', data)
+    insertUser(data)
+    userJoined(data)
+  })
+
   socket.on('disconnect', function (window) {
-    var leaver = window.nickname
-    socket.emit("leave_channel", leaver)
+    console.log("client disconnected from server")
   });
 })()

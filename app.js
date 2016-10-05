@@ -7,6 +7,7 @@ var redis = require('redis');
 
 // persists data with a messages store
 var messages = []
+var pseudos = []
 
 var storeMessage = function(name, message) {
   messages.push({ name: name, message: message })
@@ -14,6 +15,10 @@ var storeMessage = function(name, message) {
     // more than 10 messages, the first one gets removed
     messages.shift()
   }
+}
+var uiIDts = new Date().getTime()
+var storeUsers = function(userName) {
+  pseudos.push({ uID: uiIDts, userName: userName })
 }
 
 // listen to connection events and pass in client/socket
@@ -28,8 +33,14 @@ io.on('connection', function(client) {
     // sets a value for the nickname on the client side - available on client and server
     // reassigns nickname to pseudo var
     pseudo = nickname
-    client.broadcast.emit("connect", pseudo)
-
+    console.log(pseudo +' has connected on the server, socket.id is: ' + client.id )
+    client.emit("user_connected", pseudo)
+    client.broadcast.emit("user_connected", pseudo)
+    storeUsers(nickname)
+    var loggedUsers = pseudos.map(function(u) {
+      return u.userName
+    })
+    console.log('loggedUsers: ', loggedUsers)
   })
 
   // emits messages event on the client/browser sending the object
@@ -44,9 +55,15 @@ io.on('connection', function(client) {
     storeMessage(pseudo, message);
   })
 
-  client.on('leave_channel', function(leaver) {
-    console.log(leaver +' user has disconnected!')
+  client.on('disconnect', function() {
+    console.log(pseudo +' has disconnected from the server!, socket.id is: '+ client.id)
+    // reassigns the  new mutated array without leaver to the pseudos array
+    pseudos = pseudos.filter(function(p) {
+      return (p.userName !== pseudo)
+    })
   })
+
+
 });
 
 app.get('/', function(req, res) {
