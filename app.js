@@ -5,6 +5,13 @@ var io = require('socket.io').listen(server);
 var redis = require('redis');
 // var redisClient = redis.createClient();
 
+/**
+ * log level
+ *
+ * npm run env
+ * npm config list
+ */
+
 // persists data with a messages store
 var messages = []
 var pseudos = []

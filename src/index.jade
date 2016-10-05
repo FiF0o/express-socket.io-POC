@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title Document
+  body
+    header
+      h1 Hello from Chattr
+    main
+      h2 Users
+      section
+        ul#user-list
+      h2 Chattr
+      section
+        h3#status You are offline
+        p#new_user joined the room
+        div
+          ul#message-list
+      section
+        form#chat_form(action='')
+          label(for='chat_input') chat
+          input#chat_input(type='text', name='', value='')
+          input(type='submit', value='Submit')
+    footer
+    script(src='https://code.jquery.com/jquery-2.2.4.min.js', integrity='sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=', crossorigin='anonymous')
+    script(src='https://cdn.socket.io/socket.io-1.4.5.js')
+    script(src='/socket.io/socket.io.js')
+    script(src='bundle.js')
