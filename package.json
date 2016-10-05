@@ -11,11 +11,11 @@
     "js": "browserify src/main.js -o ./dist/bundle.js -d",
     "js:watch": "watchify src/main.js -o dist/bundle.js -v",
     "js:uglify": "uglifyjs dist\bundle.js  > dist\bundle.min.js",
-    "build": "npm run clean dist cp js js:watch",
+    "build": "npm run clean && npm run dist && npm run cp && npm run js && npm run js:watch",
     "cp:index": "cp src/index.html dist/index.html",
     "js:lint": "jslint src/*.js --exclude node_modules/ --verbose",
     "js:dev": "browserify src/main.js | uglifyjs -mc > dist/bundle.js",
-    "dev": "npm run cp:index js:dev",
+    "dev": "npm run cp:index && npm run js:dev && npm run js:watch",
     "prod": "browserify src/main.js  | uglifyjs -mc warnings=false > dist/bundle.js"
   },
   "author": "",
