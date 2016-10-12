@@ -41,13 +41,23 @@ io.on('connection', function(client) {
     // reassigns nickname to pseudo var
     pseudo = nickname
     console.log(pseudo +' has connected on the server, socket.id is: ' + client.id )
-    client.emit("user_connected", pseudo)
+
     client.broadcast.emit("user_connected", pseudo)
     storeUsers(nickname)
     var loggedUsers = pseudos.map(function(u) {
       return u.userName
     })
     console.log('loggedUsers: ', loggedUsers)
+
+    // emits all the message to the client who just joined
+    messages.forEach(function(message) {
+      client.emit('messages', message.name + ": " + message.message)
+    })
+
+    pseudos.forEach(function(data) {
+      client.emit('user_connected', data.userName)
+    })
+
   })
 
   // emits messages event on the client/browser sending the object
