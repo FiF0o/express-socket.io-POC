@@ -2,8 +2,21 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+
+// add data base to persist data on the client side
+/**
+ * redis-server install http://jasdeep.ca/2012/05/installing-redis-on-mac-os-x/
+ *
+ * documentation: http://redis.io/documentation
+ * config: http://redis.io/topics/config
+ *
+ * start redis server/DB: redis-server
+ *
+ */
+
 var redis = require('redis');
-// var redisClient = redis.createClient();
+var redisClient = redis.createClient();
+
 
 /**
  * log level
@@ -11,6 +24,8 @@ var redis = require('redis');
  * npm run env
  * npm config list
  */
+
+
 
 // persists data with a messages store
 var messages = []
