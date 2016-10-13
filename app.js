@@ -68,24 +68,24 @@ io.on('connection', function(client) {
     // reassigns nickname to pseudo var
     pseudo = nickname
     console.log(pseudo +' has connected on the server, socket.id is: ' + client.id )
-    // sends pseudo back to client
-    client.emit("user_connected", pseudo)
-    client.broadcast.emit("user_connected", pseudo)
-
-    // redisClient.smembers("pseudos", function(err, pseudos) {
-    //   console.log('\"pseudos\"', pseudos)
-    //
-    //   pseudos.forEach(function(data) {
-    //     data = JSON.parse(data)
-    //     console.log('data', data)
-    //
-    //     client.emit('user_connected', data.userName)
-    //     client.broadcast.emit('user_connected', data.userName)
-    //   })
-    // })
 
     // store user server side
     storeUsers(nickname)
+
+    // client.emit("user_connected", pseudo)
+    // client.broadcast.emit("user_connected", pseudo)
+    // sends pseudo back to client
+
+    redisClient.smembers("pseudos", function(err, pseudos) {
+      console.log('\"pseudos\"', pseudos)
+
+      pseudos.forEach(function(data) {
+        data = JSON.parse(data)
+        console.log('data', data)
+        // client.emit('user_connected', data.userName)
+        client.broadcast.emit('user_connected', data.userName)
+      })
+    })
 
     // var loggedUsers = pseudos.map(function(u) {
     //   return u.userName

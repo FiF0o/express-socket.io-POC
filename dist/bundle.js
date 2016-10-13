@@ -22,8 +22,11 @@ var socket = io.connect('http://localhost:3004');
   }
 
   // var removeUser = function(discUser) {
-  //   $('#user-list li[data-name=' + discUser + ']').remove()
-  // }
+  var removeUser = function(discUser) {
+    var d = $('#user-list li[data-pseudo=' + discUser + ']')
+    console.log(d)
+    d.remove()
+  }
 
   $('#chat_form').submit(function(e){
     e.preventDefault()
@@ -50,8 +53,10 @@ var socket = io.connect('http://localhost:3004');
     userJoined(data)
   })
 
-  socket.on('disconnect', function (window) {
+  socket.on('disconnect', function (data) {
     console.log("client disconnected from server")
+    console.log('data in disconnect', data)
+    removeUser(data)
   });
 })()
 
