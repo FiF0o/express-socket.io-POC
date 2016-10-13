@@ -16,7 +16,7 @@
     "build": "npm run clean && npm run html:compile &&  npm run js:watch",
     "js:lint": "jslint src/*.js --exclude node_modules/ --verbose",
     "js:prod": "browserify src/main.js | uglifyjs -mc > dist/bundle.js",
-    "dev": "npm run clean && npm run html:compile && npm run js:dev && npm run watch & npm run serve & npm run database",
+    "dev": "npm run clean && npm run html:compile && npm run js:dev && npm run watch & npm run database & npm run serve",
     "prod": "browserify src/main.js | uglifyjs -mc warnings=false > dist/bundle.js",
     "serve": "node app.js",
     "database": "redis-server"

@@ -17,7 +17,6 @@ var io = require('socket.io').listen(server);
 var redis = require('redis');
 var redisClient = redis.createClient();
 
-
 /**
  * log level
  *
@@ -25,18 +24,27 @@ var redisClient = redis.createClient();
  * npm config list
  */
 
-
+// console.log('redisClient: ', redisClient)
 
 // persists data with a messages store
 var messages = []
 var pseudos = []
 
 var storeMessage = function(name, message) {
-  messages.push({ name: name, message: message })
-  if (messages.length > 10) {
-    // more than 10 messages, the first one gets removed
-    messages.shift()
-  }
+  // stringify messages to add the redis DB
+  var message = JSON.stringify({ name: name, message: message })
+
+  redisClient.lpush('messages', message, function(err, response) {
+    // keep the newest 10 items
+    redisClient.ltrim("messages", 0, 9)
+    console.log('DB ->' + response +', ' + message)
+  })
+
+  // messages.push({ name: name, message: message })
+  // if (messages.length > 10) {
+  //   // more than 10 messages, the first one gets removed
+  //   messages.shift()
+  // }
 }
 var uiIDts = new Date().getTime()
 var storeUsers = function(userName) {
@@ -64,10 +72,19 @@ io.on('connection', function(client) {
     })
     console.log('loggedUsers: ', loggedUsers)
 
-    // emits all the message to the client who just joined
-    messages.forEach(function(message) {
-      client.emit('messages', message.name + ": " + message.message)
+    // retrieving all the messages from the DB
+    redisClient.lrange("messages", 0, -1, function(err, messages) {
+      // reverse messages to be emitted in the correct order.. lpush...
+      messages = messages.reverse()
+      // emits all the message to the client who just joined
+      messages.forEach(function(message) {
+        // parse stringyfied object from redis DB
+        message = JSON.parse(message)
+        client.emit('messages', message.name + ": " + message.message)
+      })
+
     })
+
 
     pseudos.forEach(function(data) {
       client.emit('user_connected', data.userName)
