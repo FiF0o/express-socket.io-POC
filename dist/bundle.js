@@ -5,7 +5,8 @@ var socket = io.connect('http://localhost:3004');
   console.log('Socket is opened...')
 
   var insertUser = function(newUser) {
-    $("#user-list").append("<li>" + newUser + "</li>")
+    var $li = $("<li>", { "data-pseudo": newUser, text: newUser })
+    $("#user-list").append($li)
   }
 
   var insertMessage = function(newMessage) {
@@ -19,6 +20,10 @@ var socket = io.connect('http://localhost:3004');
       console.log('User has joined the chat!')
     }
   }
+
+  // var removeUser = function(discUser) {
+  //   $('#user-list li[data-name=' + discUser + ']').remove()
+  // }
 
   $('#chat_form').submit(function(e){
     e.preventDefault()

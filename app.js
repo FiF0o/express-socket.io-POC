@@ -24,8 +24,6 @@ var redisClient = redis.createClient();
  * npm config list
  */
 
-// console.log('redisClient: ', redisClient)
-
 // persists data with a messages store
 var messages = []
 var pseudos = []
@@ -46,9 +44,15 @@ var storeMessage = function(name, message) {
   //   messages.shift()
   // }
 }
+
 var uiIDts = new Date().getTime()
 var storeUsers = function(userName) {
-  pseudos.push({ uID: uiIDts, userName: userName })
+  userName = JSON.stringify({ uID: uiIDts, userName: userName })
+  // add members to "pseudos" unique set
+  redisClient.sadd("pseudos", userName, function(err, response) {
+    console.log('DB ->' + response +', ' + userName)
+  })
+  // pseudos.push({ uID: uiIDts, userName: userName })
 }
 
 // listen to connection events and pass in client/socket
@@ -64,13 +68,29 @@ io.on('connection', function(client) {
     // reassigns nickname to pseudo var
     pseudo = nickname
     console.log(pseudo +' has connected on the server, socket.id is: ' + client.id )
-
+    // sends pseudo back to client
+    client.emit("user_connected", pseudo)
     client.broadcast.emit("user_connected", pseudo)
+
+    // redisClient.smembers("pseudos", function(err, pseudos) {
+    //   console.log('\"pseudos\"', pseudos)
+    //
+    //   pseudos.forEach(function(data) {
+    //     data = JSON.parse(data)
+    //     console.log('data', data)
+    //
+    //     client.emit('user_connected', data.userName)
+    //     client.broadcast.emit('user_connected', data.userName)
+    //   })
+    // })
+
+    // store user server side
     storeUsers(nickname)
-    var loggedUsers = pseudos.map(function(u) {
-      return u.userName
-    })
-    console.log('loggedUsers: ', loggedUsers)
+
+    // var loggedUsers = pseudos.map(function(u) {
+    //   return u.userName
+    // })
+    // console.log('loggedUsers: ', loggedUsers)
 
     // retrieving all the messages from the DB
     redisClient.lrange("messages", 0, -1, function(err, messages) {
@@ -85,11 +105,16 @@ io.on('connection', function(client) {
 
     })
 
-
-    pseudos.forEach(function(data) {
-      client.emit('user_connected', data.userName)
-    })
-
+    // redisClient.smembers("pseudos", function(err, pseudos) {
+    //   console.log('pseudos', pseudos)
+    //
+    //   pseudos.forEach(function(data) {
+    //     data = JSON.parse(data)
+    //     console.log('data', data)
+    //
+    //     client.emit('user_connected', data.userName)
+    //   })
+    // })
   })
 
   // emits messages event on the client/browser sending the object
@@ -107,6 +132,8 @@ io.on('connection', function(client) {
   client.on('disconnect', function() {
     console.log(pseudo +' has disconnected from the server!, socket.id is: '+ client.id)
     // reassigns the  new mutated array without leaver to the pseudos array
+
+
     pseudos = pseudos.filter(function(p) {
       return (p.userName !== pseudo)
     })
