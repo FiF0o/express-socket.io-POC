@@ -54,7 +54,10 @@ var socket = io.connect('http://localhost:3004');
 
   socket.on('disconnect', function (data) {
     console.log("client disconnected from server")
-    console.log('data in disconnect', data)
-    removeUser(data)
   });
+
+  socket.on('remove_user', function(pseudo) {
+    removeUser(pseudo)
+  })
+
 })()

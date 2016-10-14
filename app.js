@@ -84,6 +84,7 @@ io.on('connection', function(client) {
         console.log('data', data)
         // client.broadcast.emit('user_connected', data.userName)
         client.emit('user_connected', data.userName)
+        //TODO Fix user_joined
       })
     })
 
@@ -132,16 +133,19 @@ io.on('connection', function(client) {
 
   client.on('disconnect', function() {
     console.log(pseudo +' has disconnected from the server!, socket.id is: '+ client.id)
-    // reassigns the  new mutated array without leaver to the pseudos array
 
+    client.broadcast.emit('remove_user', pseudo)
 
-    pseudos = pseudos.filter(function(p) {
-      return (p.userName !== pseudo)
+    //TODO Fix removing item from list
+    redisClient.srem("pseudos", function(err, pseudo) {
+      console.log(pseudo ," removed from DB")
     })
+    //// reassigns the  new mutated array without leaver to the pseudos array
+    // pseudos = pseudos.filter(function(p) {
+    //   return (p.userName !== pseudo)
+    // })
   })
-
-
-});
+})
 
 app.get('/', function(req, res) {
   // sends index page on router root
