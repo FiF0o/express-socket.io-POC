@@ -14,7 +14,7 @@ App running on port `:3004` and Redis DB on port `:6379`.
 
 ## Scripts
 
-** Start the project
+<b>*Start the project*</b>
 `npm run dev`
 
 Dev mode: `npm run dev`.
